@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Mini Library</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #1e1e1e; color: white; padding: 20px; }
+    h1 { color: #9664aa; text-align: center; }
+    button { background: #9664aa; color: white; padding: 10px 20px; margin: 5px; border: none; cursor: pointer; border-radius: 5px; }
+    button:hover { background: #b585c3; }
+    #booksList { margin-top: 20px; white-space: pre-line; font-size: 16px; }
+    .container { max-width: 400px; margin: auto; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 My Mini Library</h1>
+
+    <div>
+      <button onclick="viewBooks()">View Books</button>
+      <button onclick="addBook()">Add Book</button>
+      <button onclick="searchBook()">Search Book</button>
+      <button onclick="removeBook()">Remove Book</button>
+      <button onclick="showStats()">Total Books</button>
+      <button onclick="clearLibrary()">Clear All</button>
+    </div>
+
+    <div id="booksList"></div>
+  </div>
+
+  <script>
+    // Load books from localStorage or initialize empty
+    let books = JSON.parse(localStorage.getItem('books')) || [];
+
+    function saveBooks() {
+      localStorage.setItem('books', JSON.stringify(books));
+    }
+
+    function viewBooks() {
+      if(books.length === 0){
+        document.getElementById('booksList').innerText = 'Library is empty!';
+      } else {
+        document.getElementById('booksList').innerText = books.map((b,i) => (i+1)+". "+b).join('\n');
+      }
+    }
+
+    function addBook() {
+      let name = prompt("Enter book name:");
+      if(name){
+        name = name.trim();
+        if(books.includes(name)){
+          alert("Book already exists!");
+        } else if(books.length >= 100){
+          alert("Library is full!");
+        } else {
+          books.push(name);
+          saveBooks();
+          alert("Book added!");
+          viewBooks();
+        }
+      }
+    }
+
+    function searchBook() {
+      let name = prompt("Enter book title:");
+      if(name){
+        let idx = books.findIndex(b => b.toLowerCase() === name.trim().toLowerCase());
+        if(idx >= 0){
+          alert(`Found at position ${idx+1}`);
+        } else {
+          alert("Book not found!");
+        }
+      }
+    }
+
+    function removeBook() {
+      if(books.length === 0){
+        alert("Library is empty!");
+        return;
+      }
+      let list = books.map((b,i) => (i+1)+". "+b).join('\n');
+      let num = prompt("Select book number to delete:\n"+list);
+      let idx = parseInt(num)-1;
+      if(!isNaN(idx) && idx>=0 && idx<books.length){
+        if(confirm(`Delete: ${books[idx]}?`)){
+          books.splice(idx,1);
+          saveBooks();
+          alert("Book deleted!");
+          viewBooks();
+        }
+      }
+    }
+
+    function showStats() {
+      alert(`Total: ${books.length}\nEmpty: ${100-books.length}\nCapacity: ${books.length}/100`);
+    }
+
+    function clearLibrary() {
+      if(confirm("Are you sure you want to clear the entire library?")){
+        books = [];
+        saveBooks();
+        alert("Library cleared!");
+        viewBooks();
+      }
+    }
+
+    // Initial view
+    viewBooks();
+  </script>
+</body>
+</html>
